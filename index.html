@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/borders.css')}}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Text to Speech web App</title>
+
+</head>
+
+
+
+<body>
+
+<video autoplay muted loop width=100% height=100% controls id="myVideo">
+    <source src="{{url_for('static',filename='mat.mp4')}}" type="video/mp4">
+
+    Your browser does not support the video tag.
+  </video>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">MyFlaskApp</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/Contact">Contact</a></li>
+        </ul>
+    </div>
+
+    <br>
+
+<div class="content">
+<h1>Welcome to text to speech translator!</h1>
+    <br>
+    <h3>Select Voice:</h3>> <select id='voiceList'></select> <br><br>
+
+
+    <input id='txtInput'  /> <br><br>
+    <button id='btnSpeak'>Speak!</button>
+
+</div>
+
+    <script>
+
+
+        var txtInput = document.querySelector('#txtInput');
+        var voiceList = document.querySelector('#voiceList');
+        var btnSpeak = document.querySelector('#btnSpeak');
+        var synth = window.speechSynthesis;
+        var voices = [];
+
+        PopulateVoices();
+        if(speechSynthesis !== undefined){
+            speechSynthesis.onvoiceschanged = PopulateVoices;
+        }
+
+        btnSpeak.addEventListener('click', ()=> {
+            var toSpeak = new SpeechSynthesisUtterance(txtInput.value);
+            var selectedVoiceName = voiceList.selectedOptions[0].getAttribute('data-name');
+            voices.forEach((voice)=>{
+                if(voice.name === selectedVoiceName){
+                    toSpeak.voice = voice;
+                }
+            });
+            synth.speak(toSpeak);
+        });
+
+        function PopulateVoices(){
+            voices = synth.getVoices();
+            var selectedIndex = voiceList.selectedIndex < 0 ? 0 : voiceList.selectedIndex;
+            voiceList.innerHTML = '';
+            voices.forEach((voice)=>{
+                var listItem = document.createElement('option');
+                listItem.textContent = voice.name;
+                listItem.setAttribute('data-lang', voice.lang);
+                listItem.setAttribute('data-name', voice.name);
+                voiceList.appendChild(listItem);
+            });
+
+            voiceList.selectedIndex = selectedIndex;
+        }
+    </script>
+<div id="footer"> Copyright © 2020 All Rights Reserved </div>
+</body>
+
+</html>
